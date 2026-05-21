@@ -1,8 +1,6 @@
 package dev.parrotstudios.qtotems.listener;
 
-import dev.parrotstudios.qtotems.QTotems;
 import dev.parrotstudios.qtotems.totem.QTotemRegistry;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

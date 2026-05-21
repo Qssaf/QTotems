@@ -37,6 +37,7 @@ public class QTotemRegistry {
         QTotem active = activePlayerEquips.get(player.getUniqueId());
 
         if (active != null) {
+
             active.removeEquipEffects(player);
         }
         activePlayerEquips.remove(player.getUniqueId());
@@ -93,6 +94,7 @@ public class QTotemRegistry {
     }
 
     public static void handleEffectChange(Player player){
+        if(!activePlayerEquips.containsKey(player.getUniqueId())) return;
         activePlayerEquips.remove(player.getUniqueId());
         QTotems.getInstance().getServer().getScheduler().runTaskLater(QTotems.getInstance(),()->{
             ItemStack stack = player.getInventory().getItemInOffHand();
@@ -107,7 +109,7 @@ public class QTotemRegistry {
             QTotems.getInstance().getServer().getScheduler().runTaskLater(QTotems.getInstance(),()->
                     qTotem.get().provideEquipEffects(player),1L);
             activePlayerEquips.put(player.getUniqueId(), qTotem.get());
-        },1L);
+        },2L);
     }
 
     public static QTotem getTotem(String totemName){
