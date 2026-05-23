@@ -1,7 +1,8 @@
 prefix: "<dark_red>[<red><bold>QTotems</bold></red>]</dark_red> "
 
 totems:
-  "totem1":
+  totem1:
+    enabled: true
     name: "totem1"
     lore:
       - "this is a custom totem"
@@ -10,3 +11,12 @@ totems:
       - "SLOW_FALLING;1;60"
     equipEffects:
       - "STRENGTH;1"
+
+messages:
+  onlyPlayers: "<red>Only players can use this command!"
+  usage: "<yellow>Usage: /qtotems <totem> {player}"
+  reloaded: "<green>Reloaded config!"
+  invalidTotem: "<red>Invalid totem!"
+  gaveSelf: "<green>Gave you a custom totem!"
+  gaveTarget: "<green>Gave %target% a custom totem!"
+  invalidTarget: "<red>Invalid target!"

@@ -97,7 +97,7 @@ public class Utils {
     public static Component textWithPrefix(String message) {
         if (message == null || message.isEmpty()) return Component.empty();
         try {
-            String prefix = ConfigManager.getString("prefix");
+            String prefix = ConfigManager.getString("prefix","");
             return MiniMessage.miniMessage().deserialize(MESSAGE_CACHE.get(message, ()
                     -> convertLegacyToMiniMessage(prefix + message)));
         } catch (Exception e) {

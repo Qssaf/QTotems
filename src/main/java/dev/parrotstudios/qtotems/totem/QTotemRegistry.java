@@ -122,6 +122,9 @@ public class QTotemRegistry {
     public static void populate(){
         ConfigManager.getSection("totems").getKeys(false).forEach(qTotem -> {
             try{
+                if(!ConfigManager.getBoolean("totems."+qTotem+".enabled",true)) {
+                    return;
+                }
                 QTotem totem = QTotem.create(qTotem)
                         .displayName(ConfigManager.getString("totems."+qTotem+".name"))
                         .lore(ConfigManager.getStringList("totems."+qTotem+".lore"));

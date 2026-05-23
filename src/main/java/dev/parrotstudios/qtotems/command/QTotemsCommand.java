@@ -16,46 +16,82 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class QTotemsCommand implements CommandExecutor, TabCompleter {
+    private static String msgOnlyPlayers() {
+        return ConfigManager.getString("messages.onlyPlayers", "<red>Only players can use this command!");
+    }
+
+    private static String msgUsage() {
+        return ConfigManager.getString("messages.usage", "<yellow>Usage: /qtotems <totem> {player}");
+    }
+
+    private static String msgReloaded() {
+        return ConfigManager.getString("messages.reloaded", "<green>Reloaded config!");
+    }
+
+    private static String msgInvalidTotem() {
+        return ConfigManager.getString("messages.invalidTotem", "<red>Invalid totem!");
+    }
+
+    private static String msgGaveSelf() {
+        return ConfigManager.getString("messages.gaveSelf", "<green>Gave you a custom totem!");
+    }
+
+    private static String msgGaveTarget(String targetName) {
+        String tmpl = ConfigManager.getString("messages.gaveTarget", "<green>Gave %target% a custom totem!");
+        return tmpl.replace("%target%", targetName);
+    }
+
+    private static String msgInvalidTarget() {
+        return ConfigManager.getString("messages.invalidTarget", "<red>Invalid target!");
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if(!(sender instanceof Player player)) {
-            sender.sendMessage(Utils.textWithPrefix("<red>Only players can use this command!"));
+        if (!(sender instanceof Player)) {
+            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+                ConfigManager.reloadConfig();
+                QTotemRegistry.reload();
+                sender.sendMessage(Utils.textWithPrefix(msgReloaded()));
+                return true;
+            }
+            sender.sendMessage(Utils.textWithPrefix(msgOnlyPlayers()));
             return true;
         }
+        Player player = (Player) sender;
         if(args.length == 0 || args.length > 2) {
-            player.sendMessage(Utils.textWithPrefix("<yellow>Usage: /qtotems <totem> {player}"));
+            player.sendMessage(Utils.textWithPrefix(msgUsage()));
             return true;
         }
         if(args.length == 1){
             if(args[0].equalsIgnoreCase("reload")){
                 ConfigManager.reloadConfig();
                 QTotemRegistry.reload();
-                player.sendMessage(Utils.textWithPrefix("<green>Reloaded config!"));
+                player.sendMessage(Utils.textWithPrefix(msgReloaded()));
                 return true;
             }
             QTotem totem = QTotemRegistry.getTotem(args[0]);
             if(totem == null) {
-                player.sendMessage(Utils.textWithPrefix("<red>Invalid totem!"));
+                player.sendMessage(Utils.textWithPrefix(msgInvalidTotem()));
                 return true;
             }
             player.getInventory().addItem(totem.getTotemItem());
-            player.sendMessage(Utils.textWithPrefix("<green>Gave you a custom totem!"));
+            player.sendMessage(Utils.textWithPrefix(msgGaveSelf()));
             return true;
         }
         QTotem totem = QTotemRegistry.getTotem(args[0]);
         Player target = QTotems.getInstance().getServer().getPlayer(args[1]);
         if(totem == null) {
-            player.sendMessage(Utils.textWithPrefix("<red>Invalid totem!"));
+            player.sendMessage(Utils.textWithPrefix(msgInvalidTotem()));
             return true;
         }
         if(target == null){
-            player.sendMessage(Utils.textWithPrefix("<red>Invalid target!"));
+            player.sendMessage(Utils.textWithPrefix(msgInvalidTarget()));
             return true;
         }
 
         target.getInventory().addItem(totem.getTotemItem());
-        target.sendMessage(Utils.textWithPrefix("<green>Gave you a custom totem!"));
-        player.sendMessage(Utils.textWithPrefix("<green>Gave %target% a custom totem!".replace("%target%", target.getName())));
+        target.sendMessage(Utils.textWithPrefix(msgGaveSelf()));
+        player.sendMessage(Utils.textWithPrefix(msgGaveTarget(target.getName())));
         return true;
     }
 
