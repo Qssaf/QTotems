@@ -23,12 +23,12 @@ No hardcoded effects. No messy setups. Just customize, reload, and start popping
 
 The plugin registers the main command `/totems` with aliases `/qtotems` and `/qtotem`. 
 
-| Command                    ****| Permission        | Description                                                                                |
-|:---------------------------|:--------****----------|:-------------------------------------------------------------------------------------------|
-| `/totems`                  | `qtotems.command` | Displays plugin usage message.                                                             |
-| `/totems reload`           | `qtotems.command` | Reloads the configuration and re-registers all active totems. *(Can be run from console!)* |
-| `/totems <totem>`          | `qtotems.command` | Spawns one custom totem item into your own inventory.                                      |
-| `/totems <totem> <player>` | `qtotems.command` | Spawns one custom totem item into target player's inventory.                               |
+| Command | Permission | Description |
+|:---|:---|:---|
+| `/totems` | `qtotems.command` | Displays plugin usage message. |
+| `/totems reload` | `qtotems.command` | Reloads the configuration and re-registers all active totems. *(Can be run from console!)* |
+| `/totems <totem>` | `qtotems.command` | Spawns one custom totem item into your own inventory. |
+| `/totems <totem> <player>` | `qtotems.command` | Spawns one custom totem item into target player's inventory. |
 
 ### Tab Completion
 The plugin supports complete tab completion:
