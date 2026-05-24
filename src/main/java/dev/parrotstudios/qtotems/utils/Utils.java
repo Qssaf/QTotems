@@ -12,10 +12,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * Text parsing and component utilities supporting legacy color code translation
- * and fast caching for deserialized Adventure Components.
- */
 public class Utils {
     private static final Map<Character, String> LEGACY_TO_MINI = new HashMap<>();
     private static final Cache<String, String> MESSAGE_CACHE = CacheBuilder.newBuilder()
@@ -48,13 +44,6 @@ public class Utils {
         LEGACY_TO_MINI.put('r', "<reset>");
     }
 
-    /**
-     * Converts legacy Minecraft color codes (& or §) and hex colors (e.g. &#ff00ff)
-     * into Adventure MiniMessage XML-like tags.
-     *
-     * @param input Raw text containing legacy codes.
-     * @return Converted MiniMessage string.
-     */
     public static String convertLegacyToMiniMessage(String input) {
         final StringBuilder sb = new StringBuilder(input.length());
         for (int i = 0; i < input.length(); i++) {
@@ -95,13 +84,6 @@ public class Utils {
         return sb.toString();
     }
 
-    /**
-     * Deserializes a message string into an Adventure Component.
-     * Caches parsed components for 15 minutes to maximize performance.
-     *
-     * @param message Raw string to translate.
-     * @return Deserialized net.kyori Component.
-     */
     public static Component text(String message) {
         if (message == null || message.isEmpty()) return Component.empty();
         try {
@@ -112,12 +94,6 @@ public class Utils {
         }
     }
 
-    /**
-     * Deserializes a message, automatically prefixing it with the configured plugin prefix.
-     *
-     * @param message Raw message string.
-     * @return Deserialized net.kyori Component containing prefix.
-     */
     public static Component textWithPrefix(String message) {
         if (message == null || message.isEmpty()) return Component.empty();
         try {

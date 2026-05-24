@@ -2,45 +2,29 @@ package dev.parrotstudios.qtotems.totem;
 
 import dev.parrotstudios.qtotems.QTotems;
 import dev.parrotstudios.qtotems.config.ConfigManager;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-/**
- * Central registry that manages all registered custom totems
- * and keeps track of active totem equip/pop updates for players.
- */
 public class QTotemRegistry {
     private static final List<QTotem> qTotems = new ArrayList<>();
 
     private static final HashMap<UUID,QTotem> activePlayerEquips = new HashMap<>();
 
-    /**
-     * Gets a copy list of all registered custom totems.
-     *
-     * @return List of QTotems.
-     */
     public static List<QTotem> getQTotems(){
         return new ArrayList<>(qTotems);
     }
 
-    /**
-     * Adds and registers a new custom totem to the system cache.
-     *
-     * @param qTotem The QTotem instance.
-     */
     public static void add(QTotem qTotem){
         qTotems.add(qTotem);
     }
 
-    /**
-     * Retrieves the names of all registered totems.
-     *
-     * @return List of registered totem names.
-     */
     public static List<String> getTotemNames(){
         return qTotems.stream().map(QTotem::getName).toList();
     }
@@ -49,23 +33,16 @@ public class QTotemRegistry {
         return Map.copyOf(activePlayerEquips);
     }
 
-    /**
-     * Checks if the given item stack is a registered custom totem.
-     *
-     * @param stack The item stack to check.
-     * @return true if it is a custom totem, false otherwise.
-     */
     public static boolean isQTotem(ItemStack stack){
         if (stack == null || !stack.hasItemMeta()) return false;
         PersistentDataContainer pdc = stack.getItemMeta().getPersistentDataContainer();
         return qTotems.stream().map(QTotem::getKey).anyMatch(pdc::has);
     }
 
-    /**
-     * Safely clears previous passive equip effects from the player.
-     *
-     * @param player Target player.
-     */
+    private static NamespacedKey getActiveEffectsKey() {
+        return new NamespacedKey(QTotems.getInstance(), "active_effects");
+    }
+
     public static void clearPastEffects(Player player){
         QTotem active = activePlayerEquips.get(player.getUniqueId());
         activePlayerEquips.remove(player.getUniqueId());
@@ -78,15 +55,26 @@ public class QTotemRegistry {
                 e.printStackTrace();
             }
         }
+        PersistentDataContainer pdc = player.getPersistentDataContainer();
+        NamespacedKey key = getActiveEffectsKey();
+        if (pdc.has(key, PersistentDataType.STRING)) {
+            String activeEffectsStr = pdc.get(key, PersistentDataType.STRING);
+            if (activeEffectsStr != null && !activeEffectsStr.isEmpty()) {
+                String[] effectNames = activeEffectsStr.split(";");
+                for (String name : effectNames) {
+                    PotionEffectType type = org.bukkit.Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
+                    if (type != null && player.hasPotionEffect(type)) {
+                        PotionEffect activeEffect = player.getPotionEffect(type);
+                        if (activeEffect != null && activeEffect.getDuration() > 720000) {
+                            player.removePotionEffect(type);
+                        }
+                    }
+                }
+            }
+            pdc.remove(key);
+        }
     }
 
-    /**
-     * Handles equipping a custom totem.
-     * Removes old equip effects, validates the item, and applies the new totem's passive effects.
-     *
-     * @param player Target player.
-     * @param stack The item stack equipped.
-     */
     public static void handleEquip(Player player, ItemStack stack){
         clearPastEffects(player);
         if(!isQTotem(stack)) {
@@ -97,18 +85,18 @@ public class QTotemRegistry {
             return pdc.has(qTotem1.getKey(), PersistentDataType.BOOLEAN);
         }).findFirst();
         if(qTotem.isEmpty()) return;
-        qTotem.get().provideEquipEffects(player);
-        activePlayerEquips.put(player.getUniqueId(), qTotem.get());
 
+        QTotem totem = qTotem.get();
+        totem.provideEquipEffects(player);
+        activePlayerEquips.put(player.getUniqueId(), totem);
+
+        List<String> effectNames = new ArrayList<>();
+        totem.getEquipEffects().forEach(effect -> effectNames.add(effect.getType().getKey().getKey()));
+        if (!effectNames.isEmpty()) {
+            player.getPersistentDataContainer().set(getActiveEffectsKey(), PersistentDataType.STRING, String.join(";", effectNames));
+        }
     }
 
-    /**
-     * Handles popping/consuming a custom totem.
-     * Triggers the totem's pop effects and updates the player's active equip tracking.
-     *
-     * @param player Target player.
-     * @param stack The totem item popped.
-     */
     public static void handlePop(Player player, ItemStack stack){
         if(!isQTotem(stack)) {
             return;
@@ -123,21 +111,11 @@ public class QTotemRegistry {
         activePlayerEquips.remove(player.getUniqueId(),qTotem.get());
     }
 
-    /**
-     * Cleans up player totem status and removes active effects when they disconnect.
-     *
-     * @param player Target player.
-     */
     public static void handleLeave(Player player){
         clearPastEffects(player);
         activePlayerEquips.remove(player.getUniqueId());
     }
 
-    /**
-     * Re-evaluates and applies totem effects when a player joins the server.
-     *
-     * @param player Target player.
-     */
     public static void handleJoin(Player player){
         clearPastEffects(player);
         ItemStack stack = player.getInventory().getItemInOffHand();
@@ -154,12 +132,6 @@ public class QTotemRegistry {
 
     }
 
-    /**
-     * Forces re-application of passive equip effects when active effects are changed.
-     * Useful when other plugins or actions clear player potion effects.
-     *
-     * @param player Target player.
-     */
     public static void handleEffectChange(Player player){
         if(!activePlayerEquips.containsKey(player.getUniqueId())) return;
         activePlayerEquips.remove(player.getUniqueId());
@@ -177,21 +149,10 @@ public class QTotemRegistry {
         activePlayerEquips.put(player.getUniqueId(), qTotem.get());
     }
 
-
-    /**
-     * Resolves a registered custom totem by its name ID.
-     *
-     * @param totemName Unique key name of the totem.
-     * @return The registered QTotem, or null if not found.
-     */
     public static QTotem getTotem(String totemName){
         return getQTotems().stream().filter(qTotem ->  qTotem.getName().equals(totemName)).findFirst().orElse(null);
     }
 
-    /**
-     * Reads all active totem configurations from config.yml, parses effects,
-     * builds QTotem items, and registers them.
-     */
     public static void populate(){
         ConfigManager.getSection("totems").getKeys(false).forEach(qTotem -> {
             try{
@@ -221,9 +182,17 @@ public class QTotemRegistry {
         });
     }
 
-    /**
-     * Resets the registry cache, clears active players, and re-populates configurations.
-     */
+    public static void handleDisable(){
+        qTotems.clear();
+        getActivePlayerEquips().forEach((uuid, qTotem) -> {
+            Player player = QTotems.getInstance().getServer().getPlayer(uuid);
+            if(player != null){
+                qTotem.removeEquipEffects(player);
+            }
+        });
+        activePlayerEquips.clear();
+    }
+
     public static void reload(){
         qTotems.clear();
         populate();
