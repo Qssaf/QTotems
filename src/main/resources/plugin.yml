@@ -7,7 +7,7 @@ main: dev.parrotstudios.qtotems.QTotems
 api-version: '1.21.11'
 load: POSTWORLD
 
-authors: [ Qssaf ]
+authors: [ Gayssaf ]
 
 commands:
   totems:
