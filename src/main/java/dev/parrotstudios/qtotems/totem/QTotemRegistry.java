@@ -6,6 +6,7 @@ import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
@@ -95,31 +96,8 @@ public class QTotemRegistry {
         activePlayerEquips.put(player.getUniqueId(), qTotem.get());
     }
 
-    public static void checkActiveEquips() {
-        List<UUID> activeUuids = new ArrayList<>(activePlayerEquips.keySet());
-        for (UUID uuid : activeUuids) {
-            Player player = org.bukkit.Bukkit.getPlayer(uuid);
-            if (player == null) continue;
 
-            ItemStack stack = player.getInventory().getItemInOffHand();
-            QTotem active = activePlayerEquips.get(uuid);
 
-            if (isQTotem(stack)) {
-                Optional<QTotem> qTotem = qTotems.stream().filter(qTotem1 -> {
-                    PersistentDataContainerView pdc = stack.getPersistentDataContainer();
-                    return pdc.has(qTotem1.getKey());
-                }).findFirst();
-
-                if (qTotem.isPresent() && qTotem.get().getKey().equals(active.getKey())) {
-                    active.provideEquipEffects(player);
-                } else {
-                    handleEquip(player, stack);
-                }
-            } else {
-                clearPastEffects(player);
-            }
-        }
-    }
 
     public static void checkActiveEquips() {
         List<UUID> activeUuids = new ArrayList<>(activePlayerEquips.keySet());
