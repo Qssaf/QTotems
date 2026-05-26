@@ -121,6 +121,35 @@ public class QTotemRegistry {
         }
     }
 
+    public static void checkActiveEquips() {
+        List<UUID> activeUuids = new ArrayList<>(activePlayerEquips.keySet());
+        for (UUID uuid : activeUuids) {
+            Player player = org.bukkit.Bukkit.getPlayer(uuid);
+            if (player == null) continue;
+
+            ItemStack stack = player.getInventory().getItemInOffHand();
+            QTotem active = activePlayerEquips.get(uuid);
+
+            if (isQTotem(stack)) {
+                Optional<QTotem> qTotem = qTotems.stream().filter(qTotem1 -> {
+                    PersistentDataContainer pdc = stack.getItemMeta().getPersistentDataContainer();
+                    return pdc.has(qTotem1.getKey(), PersistentDataType.BOOLEAN);
+                }).findFirst();
+
+                if (qTotem.isPresent()) {
+                    QTotem currentTotem = qTotem.get();
+                    if (active == null || !active.getKey().equals(currentTotem.getKey())) {
+                        handleEquip(player, stack);
+                    }
+                } else {
+                    clearPastEffects(player);
+                }
+            } else {
+                clearPastEffects(player);
+            }
+        }
+    }
+
     public static QTotem getTotem(String totemName) {
         return getQTotems().stream().filter(qTotem -> qTotem.getName().equals(totemName)).findFirst().orElse(null);
     }
