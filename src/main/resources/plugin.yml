@@ -1,7 +1,7 @@
 name: QTotems
 description: $description
 prefix: QTotems
-version: '1.0'
+version: '1.2.0'
 
 main: dev.parrotstudios.qtotems.QTotems
 api-version: '1.21.11'

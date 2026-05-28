@@ -19,10 +19,10 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "absorption;0;300"
-      - "resistance;0;240"
+      - "absorption;0;300;false;false;false"
+      - "resistance;0;240;false;false;false"
     equipEffects:
-      - "resistance;0"
+      - "resistance;0;false;false;false"
 
   fire:
     enabled: true
@@ -42,10 +42,10 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "fire_resistance;0;600"
-      - "strength;0;200"
+      - "fire_resistance;0;600;false;false;false"
+      - "strength;0;200;false;false;false"
     equipEffects:
-      - "fire_resistance;0"
+      - "fire_resistance;0;false;false;false"
 
   ice:
     enabled: true
@@ -65,10 +65,10 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "speed;0;300"
-      - "slow_falling;0;240"
+      - "speed;0;300;false;false;false"
+      - "slow_falling;0;240;false;false;false"
     equipEffects:
-      - "speed;0"
+      - "speed;0;false;false;false"
 
   warrior:
     enabled: true
@@ -89,11 +89,11 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "strength;1;300"
-      - "absorption;0;300"
-      - "regeneration;0;300"
+      - "strength;1;300;false;false;false"
+      - "absorption;0;300;false;false;false"
+      - "regeneration;0;300;false;false;false"
     equipEffects:
-      - "strength;0"
+      - "strength;0;false;false;false"
 
   nature:
     enabled: true
@@ -113,10 +113,10 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "regeneration;1;300"
-      - "saturation;0;600"
+      - "regeneration;1;300;false;false;false"
+      - "saturation;0;600;false;false;false"
     equipEffects:
-      - "regeneration;0"
+      - "regeneration;0;false;false;false"
 
   time:
     enabled: true
@@ -137,11 +137,11 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "speed;1;400"
-      - "haste;1;400"
-      - "slow_falling;0;400"
+      - "speed;1;400;false;false;false"
+      - "haste;1;400;false;false;false"
+      - "slow_falling;0;400;false;false;false"
     equipEffects:
-      - "haste;0"
+      - "haste;0;false;false;false"
 
   dragon:
     enabled: true
@@ -164,13 +164,13 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "fire_resistance;0;600"
-      - "strength;1;600"
-      - "resistance;0;600"
-      - "levitation;0;200"
+      - "fire_resistance;0;600;false;false;false"
+      - "strength;1;600;false;false;false"
+      - "resistance;0;600;false;false;false"
+      - "levitation;0;200;false;false;false"
     equipEffects:
-      - "fire_resistance;0"
-      - "strength;0"
+      - "fire_resistance;0;false;false;false"
+      - "strength;0;false;false;false"
 
   guardian:
     enabled: true
@@ -192,12 +192,12 @@ totems:
     material: "TOTEM_OF_UNDYING"
     amount: 1
     popEffects:
-      - "resistance;1;600"
-      - "absorption;1;600"
-      - "dolphins_grace;0;600"
+      - "resistance;1;600;false;false;false"
+      - "absorption;1;600;false;false;false"
+      - "dolphins_grace;0;600;false;false;false"
     equipEffects:
-      - "resistance;0"
-      - "dolphins_grace;0"
+      - "resistance;0;false;false;false"
+      - "dolphins_grace;0;false;false;false"
 
 messages:
   onlyPlayers: "<red>Only players can use this command!"

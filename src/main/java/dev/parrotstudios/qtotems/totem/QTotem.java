@@ -72,23 +72,23 @@ public class QTotem {
         return this;
     }
 
-    public QTotem addEquipEffect(String potionEffectName, int level) {
+    public QTotem addEquipEffect(String potionEffectName, int level, boolean ambient, boolean particles, boolean icon) {
         PotionEffectType type = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(potionEffectName));
         if (type == null) {
             QTotems.getInstance().getLogger().warning("Invalid pop effect name: " + potionEffectName + " for totem: " + this.getName());
             return this;
         }
-        equipEffects.add(new PotionEffect(type, 121, level, false, false, false));
+        equipEffects.add(new PotionEffect(type, 121, level, ambient, particles, icon));
         return this;
     }
 
-    public QTotem addPopEffect(String potionEffectName, int level, int duration) {
+    public QTotem addPopEffect(String potionEffectName, int level, int duration, boolean ambient, boolean particles, boolean icon) {
         PotionEffectType type = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(potionEffectName));
         if (type == null) {
             QTotems.getInstance().getLogger().warning("Invalid pop effect name: " + potionEffectName + " for totem: " + this.getName());
             return this;
         }
-        popEffects.add(new PotionEffect(type, duration, level, false, false, true));
+        popEffects.add(new PotionEffect(type, duration, level, ambient, particles, icon));
         return this;
     }
 

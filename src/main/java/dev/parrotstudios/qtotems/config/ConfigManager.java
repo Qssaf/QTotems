@@ -65,6 +65,9 @@ public class ConfigManager {
     public static List<String> getStringList(String path) {
         return config.getStringList(path);
     }
+    public static List<String> getStringList(String path, List<String> def) {
+        return config.getStringList(path).isEmpty() ? def : config.getStringList(path);
+    }
 
     public static ConfigurationSection getSection(String path) {
         return config.getConfigurationSection(path);

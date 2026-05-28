@@ -56,7 +56,7 @@ public class QTotemsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args.length == 1) {
-                if (QTotemRegistry.getTotem(args[0]) != null) {
+                if (QTotemRegistry.getQTotem(args[0]) != null) {
                     sender.sendMessage(Utils.textWithPrefix(msgOnlyPlayers()));
                     return true;
                 }
@@ -64,7 +64,7 @@ public class QTotemsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args.length == 2) {
-                QTotem totem = QTotemRegistry.getTotem(args[0]);
+                QTotem totem = QTotemRegistry.getQTotem(args[0]);
                 Player target = QTotems.getInstance().getServer().getPlayer(args[1]);
                 if (totem == null) {
                     sender.sendMessage(Utils.textWithPrefix(msgInvalidTotem()));
@@ -94,7 +94,7 @@ public class QTotemsCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(Utils.textWithPrefix(msgReloaded()));
                 return true;
             }
-            QTotem totem = QTotemRegistry.getTotem(args[0]);
+            QTotem totem = QTotemRegistry.getQTotem(args[0]);
             if (totem == null) {
                 player.sendMessage(Utils.textWithPrefix(msgInvalidTotem()));
                 return true;
@@ -103,7 +103,7 @@ public class QTotemsCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(Utils.textWithPrefix(msgGaveSelf()));
             return true;
         }
-        QTotem totem = QTotemRegistry.getTotem(args[0]);
+        QTotem totem = QTotemRegistry.getQTotem(args[0]);
         Player target = QTotems.getInstance().getServer().getPlayer(args[1]);
         if (totem == null) {
             player.sendMessage(Utils.textWithPrefix(msgInvalidTotem()));
@@ -134,7 +134,7 @@ public class QTotemsCommand implements CommandExecutor, TabCompleter {
                     .toList();
         }
         if (args.length == 2) {
-            if (QTotemRegistry.getTotem(args[0]) == null) return List.of();
+            if (QTotemRegistry.getQTotem(args[0]) == null) return List.of();
             return QTotems.getInstance().getServer().getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase())).toList();
         }
         return List.of();

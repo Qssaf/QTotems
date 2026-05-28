@@ -5,12 +5,11 @@ import dev.parrotstudios.qtotems.config.ConfigManager;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class QTotemRegistry {
     private static final List<QTotem> qTotems = new ArrayList<>();
     private static BukkitTask TASK;
@@ -18,7 +17,7 @@ public class QTotemRegistry {
     private static final HashMap<UUID, QTotem> activePlayerEquips = new HashMap<>();
 
     public static void startUp(){
-        TASK = QTotems.getInstance().getServer().getScheduler().runTaskTimer(QTotems.getInstance(), QTotemRegistry::checkActiveEquips, 0L, 100L);
+        TASK = QTotems.getInstance().getServer().getScheduler().runTaskTimer(QTotems.getInstance(), QTotemRegistry::checkActiveEquips, 100L, 100L);
 
     }
 
@@ -40,10 +39,17 @@ public class QTotemRegistry {
     }
 
     public static boolean isQTotem(ItemStack stack) {
-        if (stack == null || !stack.hasItemMeta()) return false;
-        if(stack.getType().isAir()) return false;
+        if (stack == null || stack.getType().isAir()) return false;
         PersistentDataContainerView pdc = stack.getPersistentDataContainer();
         return qTotems.stream().map(QTotem::getKey).anyMatch(pdc::has);
+    }
+
+    public static QTotem getQTotem(ItemStack stack){
+        if(stack == null || stack.getType().isAir()) return null;
+       return qTotems.stream().filter(qTotem -> {
+            PersistentDataContainerView pdc = stack.getPersistentDataContainer();
+            return pdc.has(qTotem.getKey());
+        }).findFirst().orElse(null);
     }
 
 
@@ -56,32 +62,18 @@ public class QTotemRegistry {
 
     public static void handleEquip(Player player, ItemStack stack) {
         clearPastEffects(player);
-        if (!isQTotem(stack)) {
-            return;
-        }
-        Optional<QTotem> qTotem = qTotems.stream().filter(qTotem1 -> {
-            PersistentDataContainerView pdc = stack.getPersistentDataContainer();
-            return pdc.has(qTotem1.getKey());
-        }).findFirst();
-        if (qTotem.isEmpty()) return;
-
-        QTotem totem = qTotem.get();
-        totem.provideEquipEffects(player);
-        activePlayerEquips.put(player.getUniqueId(), totem);
+        QTotem qTotem = getQTotem(stack);
+        if(qTotem == null) return;
+        qTotem.provideEquipEffects(player);
+        activePlayerEquips.put(player.getUniqueId(), qTotem);
     }
 
     public static void handlePop(Player player, ItemStack stack) {
-        if (!isQTotem(stack)) {
-            return;
-        }
-        Optional<QTotem> qTotem = qTotems.stream().filter(qTotem1 -> {
-            PersistentDataContainerView pdc = stack.getPersistentDataContainer();
-            return pdc.has(qTotem1.getKey());
-        }).findFirst();
-        if (qTotem.isEmpty()) return;
+        QTotem qTotem = getQTotem(stack);
+        if(qTotem == null) return;
         QTotems.getInstance().getServer().getScheduler().runTaskLater(QTotems.getInstance(), () ->
-                qTotem.get().providePopEffects(player), 1L);
-        activePlayerEquips.remove(player.getUniqueId(), qTotem.get());
+                qTotem.providePopEffects(player), 1L);
+        activePlayerEquips.remove(player.getUniqueId(), qTotem);
     }
 
     public static void handleLeave(Player player) {
@@ -93,40 +85,29 @@ public class QTotemRegistry {
     }
 
     public static void checkActiveEquips() {
-        List<UUID> activeUuids = new ArrayList<>(activePlayerEquips.keySet());
-        for (UUID uuid : activeUuids) {
+        activePlayerEquips.keySet().forEach(uuid -> {
             Player player = org.bukkit.Bukkit.getPlayer(uuid);
-            if (player == null) continue;
-
+            if (player == null) return;
             ItemStack stack = player.getInventory().getItemInOffHand();
             QTotem active = activePlayerEquips.get(uuid);
-
-            if (isQTotem(stack)) {
-                Optional<QTotem> qTotem = qTotems.stream().filter(qTotem1 -> {
-                    PersistentDataContainer pdc = stack.getItemMeta().getPersistentDataContainer();
-                    return pdc.has(qTotem1.getKey(), PersistentDataType.BOOLEAN);
-                }).findFirst();
-
-                if (qTotem.isPresent()) {
-                    QTotem totem = qTotem.get();
-                    if (totem == active) {
-                        totem.provideEquipEffects(player);
-                    } else {
-                        handleEquip(player, stack);
-                    }
-                } else {
-                    clearPastEffects(player);
-                }
-            } else {
+            QTotem newTotem = getQTotem(stack);
+            if(active == null){
                 clearPastEffects(player);
+                return;
             }
-        }
+            if (newTotem != active) {
+                handleEquip(player, stack);
+                return;
+            }
+            active.provideEquipEffects(player);
+        });
     }
 
-    public static QTotem getTotem(String totemName) {
+    public static QTotem getQTotem(String totemName) {
         return getQTotems().stream().filter(qTotem -> qTotem.getName().equalsIgnoreCase(totemName)).findFirst().orElse(null);
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public static void populate() {
         ConfigManager.getSection("totems").getKeys(false).forEach(qTotem -> {
             try {
@@ -140,11 +121,21 @@ public class QTotemRegistry {
                 List<String> equipEffects = ConfigManager.getStringList("totems." + qTotem + ".equipEffects");
                 popEffects.forEach(effect -> {
                     String[] split = effect.split(";");
-                    totem.addPopEffect(split[0].toLowerCase(), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+                    totem.addPopEffect(
+                            split[0].toLowerCase(),
+                            Integer.parseInt(split[1]),
+                            Integer.parseInt(split[2]),
+                            Boolean.parseBoolean(split[3]),
+                            Boolean.parseBoolean(split[4]),
+                            Boolean.parseBoolean(split[5]));
                 });
                 equipEffects.forEach(effect -> {
                     String[] split = effect.split(";");
-                    totem.addEquipEffect(split[0].toLowerCase(), Integer.parseInt(split[1]));
+                    totem.addEquipEffect(split[0].toLowerCase(),
+                            Integer.parseInt(split[1]),
+                            Boolean.parseBoolean(split[2]),
+                            Boolean.parseBoolean(split[3]),
+                            Boolean.parseBoolean(split[4]));
                 });
                 totem.register();
                 QTotems.getInstance().getLogger().info("Registered Qtotem: " + qTotem);
