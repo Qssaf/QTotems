@@ -74,15 +74,18 @@ public class QTotemRegistry {
         if (active != qTotem) {
             clearPastEffects(player);
         }
-        qTotem.provideEquipEffects(player);
+        QSchedulerManager.runAtEntity(player, () -> {
+            qTotem.provideEquipEffects(player);
+        });
         activePlayerEquips.put(player.getUniqueId(), qTotem);
     }
 
     public static void handlePop(Player player, ItemStack stack) {
         QTotem qTotem = getQTotem(stack);
         if (qTotem == null) return;
-        QSchedulerManager.runLater( () ->
-                qTotem.providePopEffects(player), 1L);
+        QSchedulerManager.runAtEntity(player, () -> {
+            qTotem.providePopEffects(player);
+        });
         activePlayerEquips.remove(player.getUniqueId(), qTotem);
     }
 
@@ -109,8 +112,10 @@ public class QTotemRegistry {
                 handleEquip(player, stack);
                 return;
             }
-            active.provideEquipEffects(player);
+            QSchedulerManager.runAtEntity(player, () -> {
+                active.provideEquipEffects(player);
         });
+    });
     }
 
     public static QTotem getQTotem(String totemName) {
