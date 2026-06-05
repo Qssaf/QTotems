@@ -1,7 +1,8 @@
-package dev.parrotstudios.qtotems.utils.taskwrappers;
+package dev.parrotstudios.qtotems.utils.scheduler.wrappers;
 
 
 
+import dev.parrotstudios.qtotems.utils.scheduler.QTask;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -32,4 +33,6 @@ public class BukkitQTaskWrapper implements QTask {
     public Object getNativeTask() {
         return task;
     }
+
+
 }

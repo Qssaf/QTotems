@@ -1,6 +1,7 @@
-package dev.parrotstudios.qtotems.utils.taskwrappers;
+package dev.parrotstudios.qtotems.utils.scheduler.wrappers;
 
 
+import dev.parrotstudios.qtotems.utils.scheduler.QTask;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.plugin.Plugin;
 
@@ -29,6 +30,5 @@ public class FoliaQTaskWrapper implements QTask {
     public Object getNativeTask() {
         return task;
     }
-
 
 }

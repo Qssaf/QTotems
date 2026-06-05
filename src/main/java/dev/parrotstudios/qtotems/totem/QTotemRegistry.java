@@ -2,8 +2,8 @@ package dev.parrotstudios.qtotems.totem;
 
 import dev.parrotstudios.qtotems.QTotems;
 import dev.parrotstudios.qtotems.config.ConfigManager;
-import dev.parrotstudios.qtotems.utils.QSchedulerManager;
-import dev.parrotstudios.qtotems.utils.taskwrappers.QTask;
+import dev.parrotstudios.qtotems.utils.scheduler.QSchedulerManager;
+import dev.parrotstudios.qtotems.utils.scheduler.QTask;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -98,17 +98,13 @@ public class QTotemRegistry {
     }
 
     public static void checkActiveEquips() {
-        new ArrayList<>(activePlayerEquips.keySet()).forEach(uuid -> {
-            Player player = org.bukkit.Bukkit.getPlayer(uuid);
+        new HashSet<>(activePlayerEquips.keySet()).forEach(uuid -> {
+            Player player = QTotems.getInstance().getServer().getPlayer(uuid);
             if (player == null) return;
             ItemStack stack = player.getInventory().getItemInOffHand();
             QTotem active = activePlayerEquips.get(uuid);
             QTotem newTotem = getQTotem(stack);
-            if (active == null) {
-                clearPastEffects(player);
-                return;
-            }
-            if (newTotem != active) {
+            if(newTotem != active) {
                 handleEquip(player, stack);
                 return;
             }

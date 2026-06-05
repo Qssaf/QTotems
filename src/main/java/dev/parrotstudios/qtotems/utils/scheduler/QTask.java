@@ -1,4 +1,4 @@
-package dev.parrotstudios.qtotems.utils.taskwrappers;
+package dev.parrotstudios.qtotems.utils.scheduler;
 
 
 
@@ -26,5 +26,6 @@ public interface QTask {
      * a platform-exclusive feature (like Bukkit's getTaskId()).
      */
     Object getNativeTask();
+
 
 }

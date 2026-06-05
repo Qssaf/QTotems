@@ -1,8 +1,7 @@
 package dev.parrotstudios.qtotems.listener;
 
-import dev.parrotstudios.qtotems.QTotems;
 import dev.parrotstudios.qtotems.totem.QTotemRegistry;
-import dev.parrotstudios.qtotems.utils.QSchedulerManager;
+import dev.parrotstudios.qtotems.utils.scheduler.QSchedulerManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
