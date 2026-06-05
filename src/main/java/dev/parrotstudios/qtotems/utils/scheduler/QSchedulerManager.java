@@ -25,7 +25,6 @@ public final class QSchedulerManager {
     private static final JavaPlugin plugin;
 
     private QSchedulerManager() {
-
     }
 
     private static boolean checkIfHasFoliaSchedulers() {
@@ -47,41 +46,4 @@ public final class QSchedulerManager {
         }
     }
 
-    public static QTask run(Runnable task) {
-        return scheduler.run(task);
-    }
-
-
-    public static QTask runLater(Runnable task, long delay) {
-        return scheduler.runLater(task, delay);
-    }
-
-    public static QTask runTimer(Runnable task, long delay, long period) {
-        return scheduler.runTimer(task, delay, period);
-
-    }
-
-    public static QTask runAsync(Runnable task) {
-        return scheduler.runAsync(task);
-    }
-
-    public static QTask runAtLocation(Runnable task, Location location) {
-        return scheduler.runAtLocation(task, location);
-    }
-
-    public static QTask runAtLocationLater(Runnable task, Location location, long delay) {
-        return scheduler.runAtLocationLater(task, location, delay);
-    }
-
-    public static QTask runAtEntity(Entity entity, Runnable task) {
-        return scheduler.runAtEntity(entity,task);
-    }
-
-    public static QTask runAtEntityLater(Entity entity, Runnable task, long delay) {
-        return scheduler.runAtEntityLater(entity,task, delay);
-    }
-
-    public static QTask runAtEntityTimer(Entity entity, Runnable task, long delay, long period) {
-        return scheduler.runAtEntityTimer(entity,task, delay, period);
-    }
 }

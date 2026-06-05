@@ -13,57 +13,58 @@ public class FoliaQSchedulerWrapper implements QScheduler {
     static {
         plugin = QTotems.getInstance();
     }
+
     @Override
     public QTask runLater(Runnable task, long delay) {
         return new FoliaQTaskWrapper(plugin.getServer().getGlobalRegionScheduler()
-                .runDelayed(plugin, (scheduledTask) -> task.run(), delay));
+                .runDelayed(plugin, (_) -> task.run(), delay));
     }
 
     @Override
     public QTask runTimer(Runnable task, long initialDelay, long period) {
         return new FoliaQTaskWrapper(plugin.getServer().getGlobalRegionScheduler()
-                .runAtFixedRate(plugin, (scheduledTask) -> task.run(), initialDelay, period));
+                .runAtFixedRate(plugin, (_) -> task.run(), initialDelay, period));
     }
 
     @Override
     public QTask run(Runnable task) {
         return new FoliaQTaskWrapper(plugin.getServer().getGlobalRegionScheduler()
-                .run(plugin, (scheduledTask) -> task.run()));
+                .run(plugin, (_) -> task.run()));
     }
 
     @Override
     public QTask runAsync(Runnable task) {
         return new FoliaQTaskWrapper(plugin.getServer().getAsyncScheduler()
-                .runNow(plugin, (scheduledTask) -> task.run()));
+                .runNow(plugin, (_) -> task.run()));
     }
 
     @Override
     public QTask runAtLocation(Runnable task, Location location) {
         return new FoliaQTaskWrapper(plugin.getServer().getRegionScheduler()
-                .run(plugin, location, (scheduledTask) -> task.run()));
+                .run(plugin, location, (_) -> task.run()));
     }
 
     @Override
     public QTask runAtLocationLater(Runnable task, Location location, long delay) {
         return new FoliaQTaskWrapper(plugin.getServer().getRegionScheduler()
-                .runDelayed(plugin, location, (scheduledTask) -> task.run(), delay));
+                .runDelayed(plugin, location, (_) -> task.run(), delay));
     }
 
     @Override
     public QTask runAtEntity(Entity entity, Runnable task) {
         return new FoliaQTaskWrapper(entity.getScheduler()
-                .run(plugin, (scheduledTask) -> task.run(),null));
+                .run(plugin, (_) -> task.run(),null));
     }
 
     @Override
     public QTask runAtEntityLater(Entity entity, Runnable task, long delay) {
         return new FoliaQTaskWrapper(entity.getScheduler()
-                .runDelayed(plugin, (scheduledTask) -> task.run(),null, delay));
+                .runDelayed(plugin, (_) -> task.run(),null, delay));
     }
 
     @Override
     public QTask runAtEntityTimer(Entity entity, Runnable task, long initialDelay, long period) {
         return new FoliaQTaskWrapper(entity.getScheduler()
-                .runAtFixedRate(plugin, (scheduledTask) -> task.run(),null, initialDelay, period));
+                .runAtFixedRate(plugin, (_) -> task.run(),null, initialDelay, period));
     }
 }

@@ -28,7 +28,7 @@ public class EventListener implements Listener {
         if (event.getClick() == ClickType.SWAP_OFFHAND || event.getClick() == ClickType.MIDDLE) return;
         if (event.isCancelled()) return;
         Player player = (Player) event.getWhoClicked();
-        QSchedulerManager.runLater(() ->
+        QSchedulerManager.getScheduler().runLater(() ->
                 QTotemRegistry.handleEquip(player, player.getInventory().getItemInOffHand()),1L);
     }
 

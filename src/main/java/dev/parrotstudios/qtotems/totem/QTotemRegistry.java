@@ -22,7 +22,7 @@ public class QTotemRegistry {
     private static QTask TASK;
 
     public static void startUp() {
-        TASK = QSchedulerManager.runTimer(QTotemRegistry::checkActiveEquips, 100L, 100L);
+        TASK = QSchedulerManager.getScheduler().runTimer(QTotemRegistry::checkActiveEquips, 100L, 100L);
     }
 
     @Contract(value = " -> new", pure = true)
@@ -78,14 +78,14 @@ public class QTotemRegistry {
         if (active != qTotem) {
             clearPastEffects(player);
         }
-        QSchedulerManager.runAtEntity(player, () -> qTotem.provideEquipEffects(player));
+        QSchedulerManager.getScheduler().runAtEntity(player, () -> qTotem.provideEquipEffects(player));
         activePlayerEquips.put(player.getUniqueId(), qTotem);
     }
 
     public static void handlePop(Player player, ItemStack stack) {
         QTotem qTotem = getQTotem(stack);
         if (qTotem == null) return;
-        QSchedulerManager.runAtEntity(player, () -> qTotem.providePopEffects(player));
+        QSchedulerManager.getScheduler().runAtEntity(player, () -> qTotem.providePopEffects(player));
         activePlayerEquips.remove(player.getUniqueId(), qTotem);
     }
 
@@ -108,7 +108,7 @@ public class QTotemRegistry {
                 handleEquip(player, stack);
                 return;
             }
-            QSchedulerManager.runAtEntity(player, () -> active.provideEquipEffects(player));
+            QSchedulerManager.getScheduler().runAtEntity(player, () -> active.provideEquipEffects(player));
     });
     }
 
