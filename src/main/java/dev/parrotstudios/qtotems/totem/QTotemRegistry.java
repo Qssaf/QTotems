@@ -5,6 +5,7 @@ import dev.parrotstudios.qtotems.config.ConfigManager;
 import dev.parrotstudios.qtotems.utils.QSchedulerManager;
 import dev.parrotstudios.qtotems.utils.taskwrappers.QTask;
 import io.papermc.paper.persistence.PersistentDataContainerView;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unused")
 public class QTotemRegistry {
-    private static final List<QTotem> qTotems = new ArrayList<>();
+    private static final ConcurrentHashMap<NamespacedKey, QTotem> qTotemMap = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, QTotem> activePlayerEquips = new ConcurrentHashMap<>();
     private static QTask TASK;
 
@@ -25,16 +26,16 @@ public class QTotemRegistry {
     }
 
     @Contract(value = " -> new", pure = true)
-    public static @NonNull List<QTotem> getQTotems() {
-        return new ArrayList<>(qTotems);
+    public static @NonNull HashSet<QTotem> getQTotems() {
+        return new HashSet<>(qTotemMap.values());
     }
 
     public static void add(QTotem qTotem) {
-        qTotems.add(qTotem);
+        qTotemMap.put(qTotem.getKey(), qTotem);
     }
 
     public static @NonNull @Unmodifiable List<String> getTotemNames() {
-        return qTotems.stream().map(QTotem::getName).toList();
+        return qTotemMap.values().stream().map(QTotem::getName).toList();
     }
 
     @Contract(pure = true)
@@ -45,14 +46,18 @@ public class QTotemRegistry {
     public static boolean isQTotem(ItemStack stack) {
         if (stack == null || stack.getType().isAir()) return false;
         PersistentDataContainerView pdc = stack.getPersistentDataContainer();
-        return qTotems.stream().map(QTotem::getKey).anyMatch(pdc::has);
+        if(pdc.isEmpty()) return false;
+        return pdc.getKeys().stream().anyMatch(qTotemMap::containsKey);
     }
 
     public static QTotem getQTotem(ItemStack stack) {
         if (stack == null || stack.getType().isAir()) return null;
         PersistentDataContainerView pdc = stack.getPersistentDataContainer();
         if(pdc.isEmpty()) return null;
-        return qTotems.stream().filter(qTotem -> pdc.has(qTotem.getKey())).findFirst().orElse(null);
+        for(NamespacedKey key : pdc.getKeys()) {
+            if(qTotemMap.containsKey(key)) return qTotemMap.get(key);
+        }
+        return null;
     }
 
     public static void clearPastEffects(@NonNull Player player) {
@@ -73,18 +78,14 @@ public class QTotemRegistry {
         if (active != qTotem) {
             clearPastEffects(player);
         }
-        QSchedulerManager.runAtEntity(player, () -> {
-            qTotem.provideEquipEffects(player);
-        });
+        QSchedulerManager.runAtEntity(player, () -> qTotem.provideEquipEffects(player));
         activePlayerEquips.put(player.getUniqueId(), qTotem);
     }
 
     public static void handlePop(Player player, ItemStack stack) {
         QTotem qTotem = getQTotem(stack);
         if (qTotem == null) return;
-        QSchedulerManager.runAtEntity(player, () -> {
-            qTotem.providePopEffects(player);
-        });
+        QSchedulerManager.runAtEntity(player, () -> qTotem.providePopEffects(player));
         activePlayerEquips.remove(player.getUniqueId(), qTotem);
     }
 
@@ -111,9 +112,7 @@ public class QTotemRegistry {
                 handleEquip(player, stack);
                 return;
             }
-            QSchedulerManager.runAtEntity(player, () -> {
-                active.provideEquipEffects(player);
-        });
+            QSchedulerManager.runAtEntity(player, () -> active.provideEquipEffects(player));
     });
     }
 
@@ -162,7 +161,7 @@ public class QTotemRegistry {
 
     public static void handleDisable() {
         if (TASK != null) TASK.cancel();
-        qTotems.clear();
+        qTotemMap.clear();
         new ArrayList<>(activePlayerEquips.keySet()).forEach(uuid -> {
             Player player = QTotems.getInstance().getServer().getPlayer(uuid);
             if (player != null) clearPastEffects(player);
@@ -170,7 +169,7 @@ public class QTotemRegistry {
     }
 
     public static void reload() {
-        qTotems.clear();
+        qTotemMap.clear();
         populate();
         getActivePlayerEquips().forEach((uuid, _) -> {
             Player player = QTotems.getInstance().getServer().getPlayer(uuid);
