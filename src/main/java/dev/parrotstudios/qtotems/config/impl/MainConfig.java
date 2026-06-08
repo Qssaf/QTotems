@@ -1,5 +1,6 @@
 package dev.parrotstudios.qtotems.config.impl;
 
+import dev.parrotstudios.qtotems.QTotems;
 import dev.parrotstudios.qtotems.config.Config;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class MainConfig extends Config {
       this.gaveTargetMessage = messagesSection.getString("gaveTarget", "<green>Gave %target% a custom totem!</green>");
       this.invalidTargetMessage = messagesSection.getString("invalidTarget", "<red>Invalid target!");
     } else {
+      QTotems.getInstance().getLogger().warning("Messages section is missing in config.yml! Using default messages.");
       this.onlyPlayersMessage = "<red>Only players can use this command!";
       this.usageMessage = "<yellow>Usage: /qtotems <totem> {player}";
       this.reloadedMessage = "<green>Config has been reloaded successfully!</green>";
