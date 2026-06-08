@@ -56,4 +56,9 @@ public class EventListener implements Listener {
         QTotemRegistry.handleJoin(event.getPlayer());
     }
 
+//    @EventHandler
+//    public void onSlotChange(PlayerInventorySlotChangeEvent event) {
+//        if (event.getSlot() != 40) return;
+//        QTotemRegistry.handleEquip(event.getPlayer(), event.getPlayer().getInventory().getItemInOffHand());
+//    }
 }

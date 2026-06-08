@@ -4,20 +4,27 @@ import dev.parrotstudios.qtotems.command.QTotemsCommand;
 import dev.parrotstudios.qtotems.config.ConfigManager;
 import dev.parrotstudios.qtotems.listener.EventListener;
 import dev.parrotstudios.qtotems.totem.QTotemRegistry;
+import dev.parrotstudios.qtotems.utils.scheduler.QSchedulerManager;
+import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
 public final class QTotems extends JavaPlugin {
 
+    @Getter
+    private static final ConfigManager configManager = new ConfigManager();
 
-    public static QTotems getInstance() {
-        return JavaPlugin.getPlugin(QTotems.class);
-    }
+    @Getter
+    private static QTotems instance;
 
     @Override
     public void onEnable() {
-        ConfigManager.init(this);
+        instance = this;
+        String schedulersUsed = QSchedulerManager.isFolia() ? "Using Folia Schedulers" : "Using Bukkit Schedulers";
+        getLogger().info(schedulersUsed);
+        configManager.loadConfigs();
+        getLogger().info("Loaded configs.");
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         Objects.requireNonNull(getCommand("totems")).setExecutor(new QTotemsCommand());
         QTotemRegistry.populate();

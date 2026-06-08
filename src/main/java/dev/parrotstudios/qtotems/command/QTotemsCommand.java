@@ -1,7 +1,6 @@
 package dev.parrotstudios.qtotems.command;
 
 import dev.parrotstudios.qtotems.QTotems;
-import dev.parrotstudios.qtotems.config.ConfigManager;
 import dev.parrotstudios.qtotems.totem.QTotem;
 import dev.parrotstudios.qtotems.totem.QTotemRegistry;
 import dev.parrotstudios.qtotems.utils.TextUtils;
@@ -17,111 +16,85 @@ import java.util.List;
 
 public class QTotemsCommand implements CommandExecutor, TabCompleter {
 
-    private static String msgOnlyPlayers() {
-        return ConfigManager.getString("messages.onlyPlayers", "<red>Only players can use this command!");
-    }
 
-    private static String msgUsage() {
-        return ConfigManager.getString("messages.usage", "<yellow>Usage: /qtotems <totem> {player}");
-    }
 
-    private static String msgReloaded() {
-        return ConfigManager.getString("messages.reloaded", "<green>Reloaded config!");
-    }
-
-    private static String msgInvalidTotem() {
-        return ConfigManager.getString("messages.invalidTotem", "<red>Invalid totem!");
-    }
-
-    private static String msgGaveSelf() {
-        return ConfigManager.getString("messages.gaveSelf", "<green>Gave you a custom totem!");
-    }
-
-    private static String msgGaveTarget(String targetName) {
-        String tmpl = ConfigManager.getString("messages.gaveTarget", "<green>Gave %target% a custom totem!");
-        return tmpl.replace("%target%", targetName);
-    }
-
-    private static String msgInvalidTarget() {
-        return ConfigManager.getString("messages.invalidTarget", "<red>Invalid target!");
-    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                ConfigManager.reloadConfig();
+                QTotems.getConfigManager().getMainConfig().reload();
                 QTotemRegistry.reload();
-                sender.sendMessage(TextUtils.textWithPrefix(msgReloaded()));
+                sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getReloadedMessage()));
                 return true;
             }
             if (args.length == 1) {
                 if (QTotemRegistry.getQTotem(args[0]) != null) {
-                    sender.sendMessage(TextUtils.textWithPrefix(msgOnlyPlayers()));
+                    sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getOnlyPlayersMessage()));
                     return true;
                 }
-                sender.sendMessage(TextUtils.textWithPrefix(msgInvalidTotem()));
+                sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTotemMessage()));
                 return true;
             }
             if (args.length == 2) {
                 QTotem totem = QTotemRegistry.getQTotem(args[0]);
                 Player target = QTotems.getInstance().getServer().getPlayer(args[1]);
                 if (totem == null) {
-                    sender.sendMessage(TextUtils.textWithPrefix(msgInvalidTotem()));
+                    sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTotemMessage()));
                     return true;
                 }
                 if (target == null) {
-                    sender.sendMessage(TextUtils.textWithPrefix(msgInvalidTarget()));
+                    sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTargetMessage()));
                     return true;
                 }
                 target.getInventory().addItem(totem.getTotemItem());
-                target.sendMessage(TextUtils.textWithPrefix(msgGaveSelf()));
-                sender.sendMessage(TextUtils.textWithPrefix(msgGaveTarget(target.getName())));
+                target.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveSelfMessage()));
+                sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveTargetMessage().replace("%target%", target.getName())));
                 return true;
 
             }
-            sender.sendMessage(TextUtils.textWithPrefix(msgUsage()));
+            sender.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getUsageMessage()));
             return true;
         }
         if (args.length == 0 || args.length > 2) {
-            player.sendMessage(TextUtils.textWithPrefix(msgUsage()));
+            player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getUsageMessage()));
             return true;
         }
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
-                ConfigManager.reloadConfig();
+                QTotems.getConfigManager().getMainConfig().reload();
                 QTotemRegistry.reload();
-                player.sendMessage(TextUtils.textWithPrefix(msgReloaded()));
+                player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getReloadedMessage()));
                 return true;
             }
             QTotem totem = QTotemRegistry.getQTotem(args[0]);
             if (totem == null) {
-                player.sendMessage(TextUtils.textWithPrefix(msgInvalidTotem()));
+                player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTotemMessage()));
                 return true;
             }
             player.getInventory().addItem(totem.getTotemItem());
-            player.sendMessage(TextUtils.textWithPrefix(msgGaveSelf()));
+            player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveSelfMessage()));
             return true;
         }
         QTotem totem = QTotemRegistry.getQTotem(args[0]);
         Player target = QTotems.getInstance().getServer().getPlayer(args[1]);
         if (totem == null) {
-            player.sendMessage(TextUtils.textWithPrefix(msgInvalidTotem()));
+            player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTotemMessage()));
             return true;
         }
         if (target == null) {
-            player.sendMessage(TextUtils.textWithPrefix(msgInvalidTarget()));
+            player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getInvalidTargetMessage()));
             return true;
         }
         if (target == player) {
             player.getInventory().addItem(totem.getTotemItem());
-            player.sendMessage(TextUtils.textWithPrefix(msgGaveSelf()));
+            player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveSelfMessage()));
             return true;
         }
 
         target.getInventory().addItem(totem.getTotemItem());
-        target.sendMessage(TextUtils.textWithPrefix(msgGaveSelf()));
-        player.sendMessage(TextUtils.textWithPrefix(msgGaveTarget(target.getName())));
+        target.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveSelfMessage()));
+        player.sendMessage(TextUtils.textWithPrefix(QTotems.getConfigManager().getMainConfig().getGaveTargetMessage().replace("%target%", target.getName())));
         return true;
     }
 

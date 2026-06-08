@@ -3,7 +3,7 @@ package dev.parrotstudios.qtotems.utils;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import dev.parrotstudios.qtotems.config.ConfigManager;
+import dev.parrotstudios.qtotems.QTotems;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -96,7 +96,7 @@ public class TextUtils {
 
     public static Component textWithPrefix(String message) {
         if (message == null || message.isEmpty()) return Component.empty();
-        String prefix = ConfigManager.getString("prefix", "");
+        String prefix = QTotems.getConfigManager().getMainConfig().getPrefix();
         String fullMessage = prefix + message;
         try {
             return MiniMessage.miniMessage().deserialize(MESSAGE_CACHE.get(fullMessage, ()

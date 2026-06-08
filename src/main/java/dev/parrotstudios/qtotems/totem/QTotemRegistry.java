@@ -1,11 +1,12 @@
 package dev.parrotstudios.qtotems.totem;
 
 import dev.parrotstudios.qtotems.QTotems;
-import dev.parrotstudios.qtotems.config.ConfigManager;
 import dev.parrotstudios.qtotems.utils.scheduler.QSchedulerManager;
 import dev.parrotstudios.qtotems.utils.scheduler.QTask;
 import io.papermc.paper.persistence.PersistentDataContainerView;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -118,16 +119,22 @@ public class QTotemRegistry {
 
     @SuppressWarnings("CallToPrintStackTrace")
     public static void populate() {
-        ConfigManager.getSection("totems").getKeys(false).forEach(qTotem -> {
+        FileConfiguration config = QTotems.getConfigManager().getMainConfig().getConfig();
+        ConfigurationSection section = config.getConfigurationSection("totems");
+        if (section == null) {
+            QTotems.getInstance().getLogger().warning("No totems found in configuration.");
+            return;
+        }
+        section.getKeys(false).forEach(qTotem -> {
             try {
-                if (!ConfigManager.getBoolean("totems." + qTotem + ".enabled", true)) {
+                if (!section.getBoolean("enabled", true)) {
                     return;
                 }
                 QTotem totem = QTotem.create(qTotem)
-                        .displayName(ConfigManager.getString("totems." + qTotem + ".name"))
-                        .lore(ConfigManager.getStringList("totems." + qTotem + ".lore"));
-                List<String> popEffects = ConfigManager.getStringList("totems." + qTotem + ".popEffects");
-                List<String> equipEffects = ConfigManager.getStringList("totems." + qTotem + ".equipEffects");
+                        .displayName(section.getString("name"))
+                        .lore(section.getStringList("lore"));
+                List<String> popEffects = section.getStringList("popEffects");
+                List<String> equipEffects = section.getStringList("equipEffects");
                 popEffects.forEach(effect -> {
                     String[] split = effect.split(";");
                     totem.addPopEffect(
