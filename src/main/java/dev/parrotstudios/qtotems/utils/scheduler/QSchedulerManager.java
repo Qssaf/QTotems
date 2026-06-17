@@ -21,7 +21,6 @@ public final class QSchedulerManager {
     @Getter
     private static final boolean isFolia;
 
-    @Getter
     private static final JavaPlugin plugin;
 
     private QSchedulerManager() {
