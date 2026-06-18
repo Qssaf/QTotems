@@ -1,82 +1,154 @@
-# 🛡️ QTotems
+# QTotems
 
-Hey there! Welcome to **QTotems**—a highly customizable Minecraft plugin that lets you configure custom Totems of Undying with their own unique passive (equipped) buffs and active (pop) effects. Whether you want to give players a speed boost while holding an Ice Totem or resurrect them with giant explosions of absorption hearts, QTotems handles it all directly via a simple config file.
+<p align="center">
+  <strong>A highly customizable Minecraft plugin for custom Totems of Undying.</strong><br>
+  Configure unique passive buffs and active resurrection effects directly through configuration.
+</p>
 
-No hardcoded effects. No messy setups. Just customize, reload, and start popping!
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#commands">Commands</a> •
+  <a href="#permissions">Permissions</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#build">Build</a>
+</p>
+
+
+<p align="center">
+  <strong>A highly customizable Minecraft plugin for custom Totems of Undying.</strong><br>
+  Configure unique passive buffs and active resurrection effects directly through configuration.
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#commands">Commands</a> •
+  <a href="#permissions">Permissions</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#build">Build</a>
+</p>
 
 ---
 
-## ✨ Features at a Glance
+## Features
 
-*   **Config-Driven Custom Totems:** Define as many custom totems as you like directly under `totems:` in `config.yml`.
-*   **Dual-State Potion Effects:**
-    *   **Equip Effects (Passive):** Buffs applied continuously to the player while they are holding/equipping the totem in their hand.
-    *   **Pop Effects (Active):** Custom potion effects that trigger immediately when a player pops their totem to cheat death.
-*   **Beautiful Lore & Name Formatting:** Full support for modern Adventure/MiniMessage styling (colors, gradients, bolding) and legacy Minecraft formatting (`&` color codes).
-*   **Dynamic Registries:** Instantly enable or disable totems using the `enabled: true/false` config flag.
-*   **Seamless Reloading:** Run `/totems reload` in-game or from the console to apply configuration changes instantly without server restarts.
-*   **Failsafe Mechanics:** Safely handles missing config parameters, prints clear warnings to console instead of crashing, and safely resets player effects on disconnect.
+### Config-Driven Custom Totems
+
+Define an unlimited number of custom totems under the `totems:` section in `config.yml`.
+
+### Dual-State Potion Effects
+
+Each totem supports two independent effect systems:
+
+* **Equip Effects (Passive)** — Continuous buffs applied while the totem is held.
+* **Pop Effects (Active)** — Effects triggered immediately when the totem activates.
+
+### Rich Formatting Support
+
+Supports both modern Adventure/MiniMessage formatting and legacy `&` color codes for names, lore, and messages.
+
+### Dynamic Registries
+
+Enable or disable individual totems at any time using:
+
+```yaml
+enabled: true
+```
+
+### Live Reloading
+
+Apply configuration changes instantly without restarting the server using:
+
+```text
+/totems reload
+```
+
+### Failsafe Mechanics
+
+QTotems is designed to fail gracefully by:
+
+* Handling missing configuration values safely.
+* Logging clear warnings to the console.
+* Resetting temporary player effects on disconnect.
 
 ---
 
-## 🛠️ Command Reference
+## Commands
 
-The plugin registers the main command `/totems` with aliases `/qtotems` and `/qtotem`. 
+QTotems registers the `/totems` command with the aliases `/qtotems` and `/qtotem`.
 
-| Command | Permission | Description |
-|:---|:---|:---|
-| `/totems` | `qtotems.command` | Displays plugin usage message. |
-| `/totems reload` | `qtotems.command` | Reloads the configuration and re-registers all active totems. *(Can be run from console!)* |
-| `/totems <totem>` | `qtotems.command` | Spawns one custom totem item into your own inventory. |
-| `/totems <totem> <player>` | `qtotems.command` | Spawns one custom totem item into target player's inventory. |
+| Command                    | Permission        | Description                                                                      |
+| -------------------------- | ----------------- | -------------------------------------------------------------------------------- |
+| `/totems`                  | `qtotems.command` | Displays the plugin usage message.                                               |
+| `/totems reload`           | `qtotems.command` | Reloads the configuration and re-registers active totems. *(Console compatible)* |
+| `/totems <totem>`          | `qtotems.command` | Gives a custom totem to yourself.                                                |
+| `/totems <totem> <player>` | `qtotems.command` | Gives a custom totem to another player.                                          |
 
 ### Tab Completion
-The plugin supports complete tab completion:
-*   First argument: Completes active totem IDs registered in the system (and `reload`).
-*   Second argument: Completes online player names (only if a valid totem ID is selected).
+
+* **First argument:** Active totem IDs and `reload`.
+* **Second argument:** Online player names when a valid totem ID is specified.
 
 ---
 
-## 🔑 Permissions
+## Permissions
 
-*   `qtotems.command`
-    *   **Description:** Allows access to the main command structure (`/totems`, reload, and giving/spawning totems).
-    *   **Default:** `op` (Admin only by default; can be assigned via LuckPerms or other permission managers).
+| Permission        | Default | Description                                                                     |
+| ----------------- | ------- | ------------------------------------------------------------------------------- |
+| `qtotems.command` | `op`    | Grants access to all QTotems commands, including reloading and spawning totems. |
 
 ---
 
-## ⚙️ Configuration Guide (`config.yml`)
+## Configuration
 
-The plugin configuration is located at [src/main/resources/config.yml](file:///home/qsssaf/IdeaProjects/QTotems/src/main/resources/config.yml) (or `plugins/QTotems/config.yml` on a live server).
+The configuration file is located at:
+
+* **Production:** `plugins/QTotems/config.yml`
+* **Source:** `src/main/resources/config.yml`
 
 ### Main Sections
 
-1.  **`prefix`**: The message prefix prefixed to all plugin messages. Supports MiniMessage XML formatting.
-2.  **`totems`**: A dictionary map of totem IDs containing:
-    *   `enabled`: If `false`, the totem is ignored and not registered.
-    *   `name`: The display name of the item.
-    *   `lore`: List of lines shown on the item tooltip.
-    *   `popEffects`: Format `"effect_name;amplifier;duration_in_ticks;ambient;particles;icon"`.
-    *   `equipEffects`: Format `"effect_name;amplifier;ambient;particles;icon"`.
-3.  **`messages`**: Customizable translation messages for plugin feedback.
+| Section    | Description                                                           |
+| ---------- | --------------------------------------------------------------------- |
+| `prefix`   | Prefix prepended to plugin messages. Supports MiniMessage formatting. |
+| `totems`   | Collection of custom totem definitions.                               |
+| `messages` | Customizable messages used throughout the plugin.                     |
 
-### Format Details
+### Effect Formats
 
-> [!NOTE]
-> *   **Amplifiers:** In Minecraft/Spigot, amplifiers are **0-indexed**. This means `0` represents Level I, `1` represents Level II, etc.
-> *   **Durations:** Pop durations are measured in **server ticks** (20 ticks = 1 second).
+#### Pop Effects
+
+```text
+effect_name;amplifier;duration_in_ticks;ambient;particles;icon
+```
+
+#### Equip Effects
+
+```text
+effect_name;amplifier;ambient;particles;icon
+```
+
+> **Note:** Potion amplifiers are **0-indexed** (`0` = Level I, `1` = Level II, and so on). Pop effect durations use server ticks (`20 ticks = 1 second`).
 
 ---
 
-## 🛠️ Build and Development
+## Build
 
-To compile the plugin from source, simply build the project using Gradle.
+Compile the plugin using Gradle:
 
 ```bash
 ./gradlew build -x test
 ```
 
-The compiled jar file will be output to the build directory:
-👉 `build/libs/QTotems-x.x.x.jar`
+The compiled JAR will be generated at:
 
-Copy the jar file to your Minecraft server's `/plugins` folder and run `/reload` or restart the server.
+```text
+build/libs/QTotems-x.x.x.jar
+```
+
+Copy the generated JAR into your server's `/plugins` directory, then restart the server or reload your plugin setup.
+
+---
+
+<p align="center">
+  <sub>Built for Spigot and Paper servers. Fully configurable. No hardcoded effects. No unnecessary complexity.</sub>
+</p>
